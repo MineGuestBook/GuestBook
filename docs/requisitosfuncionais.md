@@ -39,6 +39,35 @@
 
 ---
 
+# Regras de Negócio
+
+## Conta e Perfil
+
+- **RN1** — Cada conta possui exatamente um perfil/página de comentários (RF2), criado automaticamente no momento do cadastro (RF1).
+- **RN2** — O nome de usuário/identificador do perfil deve ser único no sistema, pois é usado para localizar o perfil (RF7) e montar a URL pública dele (RF9).
+- **RN3** — Ao excluir a conta (RF4), o perfil e todos os comentários associados a ele (recebidos e, se houver, os feitos por essa conta em outros perfis) são excluídos permanentemente.
+- **RN4** — O link de recuperação de senha (RF6) deve ter validade limitada e só pode ser usado uma vez.
+- **RN5** — A redefinição de senha (RF5/RF6) pode resultar em uma senha igual à anterior; o sistema não deve comparar ou bloquear com base na senha antiga, pois isso poderia ser explorado para descobrir a senha atual do usuário.
+
+## Comentários
+
+- **RN6** — Comentar em um perfil (RF10) nunca exige autenticação — autenticação só é necessária para criar, editar ou excluir a própria conta/perfil (RF1, RF3, RF4, RF5, RF6). Todo comentário está associado apenas ao perfil de destino, nunca a uma conta do autor.
+- **RN7** — Ao comentar (RF11), o nome de usuário e o email são ambos campos livres e opcionais; se o nome for deixado em branco, o comentário é exibido como "Anônimo". O email, quando informado, é apenas um dado de contato exibido/associado ao comentário, não usado para autenticação.
+- **RN8** — Somente o dono do perfil pode excluir comentários publicados nele (RF12); o autor do comentário (autenticado ou não) não tem essa permissão sobre o próprio comentário nesse fluxo.
+- **RN9** — Um "like" (RF13) está associado a um comentário específico; a mesma origem (usuário autenticado, ou visitante identificado por sessão/IP quando anônimo) não pode dar mais de um like no mesmo comentário.
+- **RN10** — Excluir um comentário (RF12) deve remover também os likes associados a ele.
+
+## Integração e Distribuição
+
+- **RN11** — O widget embutível (RF14) só pode exibir comentários de um perfil que exista e esteja ativo no sistema.
+- **RN12** — O conteúdo exibido pelo widget deve refletir o mesmo conjunto de comentários visíveis na página pública do perfil (RF9) — não pode divergir (ex.: mostrar comentário já excluído).
+
+## Notificações
+
+- **RN13** — A notificação por email de novo comentário (RF15) só é enviada ao dono do perfil se ele tiver uma conta ativa e email válido cadastrado.
+
+---
+
 ## Requisitos gerais da disciplina (referência)
 
 ### Funcionais
