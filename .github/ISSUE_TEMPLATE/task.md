@@ -1,7 +1,7 @@
 ---
-name: []
-about: []
-title: []
+name: [label]
+about: [label]
+title: [label]
 labels: ''
 ---
 
