@@ -1,6 +1,6 @@
 ---
-name: issueName
-about: issueAbout
+name: BUG
+about: ISSUE BUG TEMPLATE
 title: issueTitle
 labels: bug
 assignees: ''

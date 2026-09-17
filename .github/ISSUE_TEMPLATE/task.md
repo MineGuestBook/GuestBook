@@ -1,6 +1,6 @@
 ---
-name: taskName
-about: taskAbout
+name: TASK
+about: ISSUE TASK TEMPLATE
 title: taskTitle
 labels: ''
 ---
