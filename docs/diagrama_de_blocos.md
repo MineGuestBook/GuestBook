@@ -1,46 +1,59 @@
-# GuestBook — Diagrama de Blocos (Arquitetura)
+# GuestBook — Diagrama de Blocos (Arquitetura com Cloudflare + Resend)
 
-> Diagrama agnóstico de provedor de nuvem. A escolha da operadora (Azure, GCP, Oracle Cloud, Render, Railway, etc.) ainda está em aberto — o requisito é apenas ter free tier, já que AWS está descartada.
+> Diagrama com os serviços específicos da Cloudflare escolhidos para o projeto, no mesmo nível de detalhe do exemplo com AWS (CloudFront, Cognito, etc.) apresentado em aula.
 
 ```mermaid
 flowchart TB
-    Client["Navegador do Cliente<br/>(Frontend baixado sob demanda)"]
+    Client["Navegador do Cliente"]
 
-    subgraph Cloud["Nuvem (provedor a definir)"]
+    DNS["Cloudflare DNS"]
+    CDN["Cloudflare CDN"]
+
+    subgraph Cloudflare["Cloudflare"]
         direction TB
 
-        Frontend["Frontend estático<br/>(hospedagem + CDN)"]
-        API["Backend / API RESTful"]
-        DB[("Banco de Dados<br/>usuários, perfis, comentários, likes")]
-        Storage[("Armazenamento de arquivos<br/>fotos de perfil, assets de estilização")]
-
-        Frontend -.->|entrega dos arquivos| Client
-        Client -->|requisições REST| API
-        API --> DB
-        API --> Storage
+        Pages["Cloudflare Pages<br/>(frontend estático)"]
+        Workers["Cloudflare Workers<br/>(backend / API RESTful)"]
+        D1[("Cloudflare D1<br/>usuários, perfis, comentários, likes")]
+        R2[("Cloudflare R2<br/>fotos de perfil, assets de estilização")]
     end
 
-    AuthProvider["Provedor de Autenticação Externo<br/>(Google, Apple, etc.)"]
-    EmailService["Serviço de Email<br/>(notificações)"]
+    OAuth["Google / Apple OAuth<br/>(autenticação externa)"]
+    Resend["Resend<br/>(envio de email, externo)"]
     ThirdPartySite["Site de Terceiros<br/>(widget embutível)"]
 
-    Client -->|login/autorização| AuthProvider
-    AuthProvider -->|token| API
-    API -->|dispara envio| EmailService
-    EmailService -->|notifica| Client
-    API -->|serve dados do widget| ThirdPartySite
+    Client -->|resolve domínio| DNS
+    DNS --> CDN
+    CDN -->|assets estáticos| Pages
+    CDN -->|requisições /api| Workers
+
+    Pages -.->|entrega os arquivos| Client
+    Workers <--> D1
+    Workers <--> R2
+    Workers -->|chamada de API| Resend
+    Resend -->|notifica| Client
+
+    Client -->|login/autorização| OAuth
+    OAuth -->|token| Workers
+
+    Workers -->|serve dados do widget| ThirdPartySite
 ```
 
 ## Componentes
 
-| Bloco | Responsabilidade |
-|---|---|
-| **Frontend** | Interface web, baixada sob demanda no navegador do cliente |
-| **Backend / API RESTful** | Regras de negócio, autenticação/autorização, orquestra acesso a dados |
-| **Banco de Dados** | Persistência de contas, perfis, comentários e likes |
-| **Armazenamento de arquivos** | Fotos de perfil e assets usados na estilização da página |
-| **Provedor de Autenticação Externo** | Login via OAuth (Google, Apple, etc.) — nenhuma senha de terceiro é gerenciada diretamente |
-| **Serviço de Email** | Envio de notificações de novo comentário e recuperação de senha |
-| **Site de Terceiros** | Consome o widget embutível, exibindo os comentários do perfil fora do domínio do GuestBook |
+| Bloco | Serviço | Responsabilidade |
+|---|---|---|
+| **DNS** | Cloudflare DNS | Resolução do domínio do projeto |
+| **CDN** | Cloudflare CDN | Roteamento de borda, cache de assets estáticos |
+| **Frontend** | Cloudflare Pages | Hospedagem do frontend, baixado sob demanda no navegador |
+| **Backend / API** | Cloudflare Workers | Regras de negócio, autenticação/autorização, orquestra acesso a dados |
+| **Banco de Dados** | Cloudflare D1 (SQLite serverless) | Persistência de contas, perfis, comentários e likes |
+| **Armazenamento de arquivos** | Cloudflare R2 | Fotos de perfil e assets usados na estilização da página |
+| **Autenticação externa** | Google / Apple OAuth | Login via provedor externo — **não existe um serviço equivalente ao Cognito na Cloudflare**, então essa integração é feita diretamente no Worker |
+| **Serviço de Email** | Resend (externo, fora da Cloudflare) | Envio de notificações de novo comentário e recuperação de senha, via chamada de API a partir do Worker |
+| **Site de Terceiros** | — | Consome o widget embutível, exibindo os comentários do perfil fora do domínio do GuestBook |
 
+## Observações importantes
 
+- Diferente do exemplo com AWS (onde o Cognito centraliza identidade), a Cloudflare **não tem um serviço de identidade gerenciado**. O fluxo OAuth com Google/Apple é implementado no próprio Worker (rotas `/auth/google`, `/auth/google/callback`), que troca o `code` pelo token direto com o provedor e depois cria a sessão do usuário, salva no D1. Esse é o principal ponto onde a arquitetura Cloudflare exige mais código próprio do que a AWS exigiria com o Cognito.
+- O envio de email também é externo: o **Cloudflare Email Sending** nativo exige o plano pago (Workers Paid), então o envio de notificações (RF15) é delegado ao **Resend**, chamado via API a partir do Worker. Assim como o OAuth, esse bloco fica fora do subgraph da Cloudflare no diagrama, por ser um serviço de terceiro.
