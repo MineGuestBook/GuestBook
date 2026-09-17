@@ -10,10 +10,10 @@ O dono do perfil pode excluir comentários no seu próprio perfil. A conta auten
 
 | Documento | Descrição |
 |---|---|
-| [Requisitos](./GuestBook-RFs.md) | Requisitos funcionais, não funcionais e regras de negócio |
-| [Casos de Uso](./GuestBook-CasosDeUso.md) | Descrição textual dos casos de uso (UC01–UC11) |
-| [Diagrama de Casos de Uso](./GuestBook-UseCaseDiagram.md) | Diagrama geral de atores e casos de uso |
-| [Fluxos individuais](./casos-de-uso/) | Um fluxograma por caso de uso |
+| [Requisitos](./docs/requisitosfuncionais.md) | Requisitos funcionais, não funcionais e regras de negócio |
+| [Casos de Uso](./docs/casos_de_uso.md) | Descrição textual dos casos de uso (UC01–UC11) |
+| [Diagrama de Bloco](./docs/diagrama_de_blocos.md) | Diagrama de Blocos |
+| [Fluxos individuais](./docs/UCs/) | Um fluxograma por caso de uso |
 
 ## Atores
 
