@@ -1,7 +1,7 @@
 ---
-name: [label]
-about: [label]
-title: [label]
+name: issueName
+about: issueAbout
+title: issueTitle
 labels: bug
 assignees: ''
 ---

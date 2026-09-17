@@ -1,17 +1,13 @@
 ---
-name: [label]
-about: [label]
-title: [label]
+name: taskName
+about: taskAbout
+title: taskTitle
 labels: ''
 ---
 
 ## Descrição
 
 <!-- O que precisa ser feito? -->
-
-## Requisito relacionado
-
-<!-- Ex.: RF10, RN7, UC07 — ou "N/A" se não se aplica -->
 
 ## Critérios de aceitação
 
