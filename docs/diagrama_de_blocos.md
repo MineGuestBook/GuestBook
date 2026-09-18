@@ -13,7 +13,7 @@ flowchart TB
         direction TB
 
         Pages["Cloudflare Pages<br/>(frontend estático)"]
-        Workers["Cloudflare Workers<br/>(backend / API RESTful)"]
+        Workers["Cloudflare Workers<br/>(backend / API RESTful)<br/>Route wildcard *.xxxxx.com/*<br/>roteia por header Host: domínio raiz → login/perfil, subdomínio → comentários do usuário"]
         D1[("Cloudflare D1<br/>usuários, perfis, comentários, likes")]
         R2[("Cloudflare R2<br/>fotos de perfil, assets de estilização")]
     end
@@ -57,3 +57,4 @@ flowchart TB
 
 - Diferente do exemplo com AWS (onde o Cognito centraliza identidade), a Cloudflare **não tem um serviço de identidade gerenciado**. O fluxo OAuth com Google/Apple é implementado no próprio Worker (rotas `/auth/google`, `/auth/google/callback`), que troca o `code` pelo token direto com o provedor e depois cria a sessão do usuário, salva no D1. Esse é o principal ponto onde a arquitetura Cloudflare exige mais código próprio do que a AWS exigiria com o Cognito.
 - O envio de email também é externo: o **Cloudflare Email Sending** nativo exige o plano pago (Workers Paid), então o envio de notificações (RF15) é delegado ao **Resend**, chamado via API a partir do Worker. Assim como o OAuth, esse bloco fica fora do subgraph da Cloudflare no diagrama, por ser um serviço de terceiro.
+- **Domínio raiz vs. subdomínio do usuário.** `xxxxx.com` concentra login e perfil; `nomedousuario.xxxxx.com` serve os comentários daquele usuário. Isso é resolvido com um registro DNS wildcard (`*.xxxxx.com`) e uma Workers Route wildcard (`*.xxxxx.com/*`), ambos cobertos pelo free tier (o Universal SSL da Cloudflare já inclui certificado wildcard de um nível). O mesmo Worker lê o header `Host` da requisição para decidir qual conteúdo servir. O cookie de sessão precisa ter o domínio configurado como `.xxxxx.com` (com o ponto), para ser válido tanto no domínio raiz quanto em qualquer subdomínio de usuário.
