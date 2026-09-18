@@ -4,9 +4,9 @@
 
 ```mermaid
 flowchart TB
-    Client["Navegador do Cliente"]
+    Client["Navegador do Cliente<br/>(xxxxx.com ou nomedousuario.xxxxx.com)"]
 
-    DNS["Cloudflare DNS"]
+    DNS["Cloudflare DNS<br/>(registro wildcard *.xxxxx.com)"]
     CDN["Cloudflare CDN"]
 
     subgraph Cloudflare["Cloudflare"]
