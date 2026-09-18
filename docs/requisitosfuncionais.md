@@ -44,10 +44,12 @@
 ## Conta e Perfil
 
 - **RN1** — Cada conta possui exatamente um perfil/página de comentários (RF2), criado automaticamente no momento do cadastro (RF1).
-- **RN2** — O nome de usuário/identificador do perfil deve ser único no sistema, pois é usado para localizar o perfil (RF7) e montar a URL pública dele (RF9).
+- **RN2** — O nome de usuário/identificador do perfil deve ser único no sistema, pois é usado para localizar o perfil (RF7), montar a URL pública dele (RF9) e, na arquitetura adotada, como subdomínio (`nomedousuario.xxxxx.com`).
 - **RN3** — Ao excluir a conta (RF4), o perfil e todos os comentários associados a ele (recebidos e, se houver, os feitos por essa conta em outros perfis) são excluídos permanentemente.
 - **RN4** — O link de recuperação de senha (RF6) deve ter validade limitada e só pode ser usado uma vez.
 - **RN5** — A redefinição de senha (RF5/RF6) pode resultar em uma senha igual à anterior; o sistema não deve comparar ou bloquear com base na senha antiga, pois isso poderia ser explorado para descobrir a senha atual do usuário.
+- **RN15** — Nomes de usuário que colidam com rotas reservadas do sistema (ex.: `www`, `api`, `admin`, `mail`) não podem ser cadastrados, pois o nome de usuário é usado diretamente como subdomínio.
+- **RN16** — A sessão de autenticação deve ser válida tanto no domínio raiz (`xxxxx.com`) quanto em qualquer subdomínio de usuário (`*.xxxxx.com`), para que o dono do perfil permaneça autenticado ao excluir comentários (RF12) em seu próprio subdomínio.
 
 ## Comentários
 
